@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# from PIL import Image, ImageEnhance
 import logging
 from uuid import uuid4
 from telegram import InlineQueryResult, InlineQueryResultArticle, ParseMode, InputTextMessageContent, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -34,7 +33,7 @@ class TelegramBot:
 
         def main_menu_state_handler(update: Update, context: CallbackContext) -> int:
             logger.info("Main menu")
-            text = 'Привет. Пришли мне фотку, и я сделаю ее черно-белой.'
+            text = 'Привет. Присылайте мне фотки (по одной за раз), и я сделаю их черно-белыми.'
             update.message.reply_text(text)
             return UPLOAD_PHOTO_STATE
 
@@ -42,17 +41,19 @@ class TelegramBot:
             user = update.message.from_user
             photo = update.message.photo[-1]
             file_id = photo.file_id
-            file_path = f'Photos/{file_id}'
-            if not os.path.isfile(file_path):
+            original_file_path = f'Photos/{file_id}'
+            if not os.path.isfile(original_file_path):
                 photo_file = photo.get_file()
-                photo_file.download(file_path)
+                photo_file.download(original_file_path)
 
-            logger.info("UserPhoto of %s: %s", user.first_name, file_path)
+            logger.info("UserPhoto of %s: %s", user.first_name, original_file_path)
 
-            photo = open(file_path, 'rb')
-            filtered_photo = self.__blackAndWhiteFilter.apply(photo)
-            update.message.reply_photo(filtered_photo, reply_to_message_id=update.message.message_id)
-            update.message.reply_text('Отлично!',)
+            file_bytes = photo = open(original_file_path, 'rb').read()
+            converted_file_path = f'Results/{file_id}.png'
+            self.__blackAndWhiteFilter.apply(original_file_path, converted_file_path)
+
+            converted_photo = open(converted_file_path, 'rb')
+            update.message.reply_photo(converted_photo, reply_to_message_id=update.message.message_id)
             return MAIN_MENU_STATE
 
         def send_photo(update: Update, context: CallbackContext) -> int:
@@ -71,13 +72,11 @@ class TelegramBot:
             states={
                 MAIN_MENU_STATE: [
                     MessageHandler(Filters.text, send_photo),
-                    # MessageHandler(Filters.regex('^.*Список всех карточек.*$'), get_all_card_state_handler)
                     MessageHandler(Filters.photo, upload_photo_handler),
                 ],
                 UPLOAD_PHOTO_STATE: [
                     MessageHandler(Filters.photo, upload_photo_handler),
                     MessageHandler(Filters.text, send_photo),
-                    # CommandHandler('skip', skip_photo)
                 ],
             },
             fallbacks=[CommandHandler('cancel', cancel)],
