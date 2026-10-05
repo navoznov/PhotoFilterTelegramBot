@@ -1,36 +1,36 @@
 # PhotoFilterTelegramBot
 
-Telegram-бот, который делает фотографии чёрно-белыми. Присылаете фото, бот отвечает на него той же картинкой в оттенках серого (PNG).
+A Telegram bot that turns photos black and white. Send it a photo, and it replies with the same picture in grayscale (PNG).
 
-## Как пользоваться
+## Usage
 
-1. Отправьте боту `/start`.
-2. Присылайте фото по одному. На каждое бот ответит обработанной копией.
-3. `/cancel` завершает диалог.
+1. Send the bot `/start`.
+2. Send photos one at a time. The bot replies to each with a processed copy.
+3. `/cancel` ends the conversation.
 
-## Запуск
+## Running
 
-Нужны Python 3, [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) 13.x (бот написан под старый API с `Updater` и `Filters`, на версиях 20+ не запустится) и [Pillow](https://python-pillow.org/):
+You need Python 3, [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) 13.x and [Pillow](https://python-pillow.org/). The bot uses the old API with `Updater` and `Filters`, so it won't run on version 20 or newer.
 
 ```sh
 pip3 install "python-telegram-bot<14" Pillow
 ```
 
-1. Создайте бота у [@BotFather](https://t.me/BotFather) и получите токен.
-2. Создайте рядом со скриптами папки `Photos` (сюда скачиваются оригиналы) и `Results` (сюда сохраняются обработанные картинки). Сам бот их не создаёт.
-3. Запустите:
+1. Create a bot with [@BotFather](https://t.me/BotFather) and get its token.
+2. Next to the scripts, create the folders `Photos` (downloaded originals go here) and `Results` (processed pictures go here). The bot doesn't create them itself.
+3. Run:
 
    ```sh
-   python3 main.py --bot-token=<токен>
+   python3 main.py --bot-token=<token>
    ```
 
-## Устройство
+## Project layout
 
-- `main.py` — точка входа: читает параметры и запускает бота.
-- `optionsParser.py`, `options.py` — разбор параметра `--bot-token`.
-- `telegramBot.py` — диалог с пользователем: приветствие, приём фото, отправка результата.
-- `blackAndWhiteFilter.py` — сам фильтр: перевод картинки в оттенки серого через Pillow.
+- `main.py`: the entry point. Reads the options and starts the bot.
+- `optionsParser.py`, `options.py`: parse the `--bot-token` option.
+- `telegramBot.py`: the conversation with the user: greeting, receiving photos, sending results.
+- `blackAndWhiteFilter.py`: the filter itself, which converts a picture to grayscale with Pillow.
 
-## Лицензия
+## License
 
 [GPL-3.0](LICENSE)
